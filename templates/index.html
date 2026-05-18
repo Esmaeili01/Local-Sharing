@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Share Files & Text{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>📁 Local File & Text Sharing</h1>
+    <div class="server-info">
+        <span class="server-ip-label">🌐 Server IP:</span>
+        <span class="server-ip" id="serverIp">Loading...</span>
+    </div>
+</div>
+
+<!-- Share Section with Tabs -->
+<div class="share-section">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('text')">📝 Share Text</button>
+        <button class="tab-btn" onclick="switchTab('file')">📎 Share File</button>
+    </div>
+    
+    <!-- Share Text Tab -->
+    <div id="textTab" class="tab-content active">
+        <form id="textForm">
+            <input type="text" id="textTitle" placeholder="Title (optional)" maxlength="200">
+            <textarea id="textContent" rows="8" placeholder="Enter your text here..." required></textarea>
+            
+            <div class="expiry-selector">
+                <label>⏰ Expires after:</label>
+                <select id="textExpiry">
+                    <option value="5_minutes">5 minutes</option>
+                    <option value="30_minutes">30 minutes</option>
+                    <option value="1_hour" selected>1 hour</option>
+                    <option value="6_hours">6 hours</option>
+                    <option value="12_hours">12 hours</option>
+                    <option value="24_hours">24 hours</option>
+                    <option value="7_days">7 days</option>
+                </select>
+            </div>
+            
+            <button type="submit">📤 Share Text</button>
+        </form>
+        <div id="textResult" class="result-box" style="display:none;"></div>
+    </div>
+    
+    <!-- Share File Tab -->
+    <div id="fileTab" class="tab-content">
+        <form id="fileForm" enctype="multipart/form-data">
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" required>
+            </div>
+            
+            <div class="expiry-selector">
+                <label>⏰ Expires after:</label>
+                <select id="fileExpiry">
+                    <option value="5_minutes">5 minutes</option>
+                    <option value="30_minutes">30 minutes</option>
+                    <option value="1_hour" selected>1 hour</option>
+                    <option value="6_hours">6 hours</option>
+                    <option value="12_hours">12 hours</option>
+                    <option value="24_hours">24 hours</option>
+                    <option value="7_days">7 days</option>
+                </select>
+            </div>
+            
+            <button type="submit">📤 Upload & Share</button>
+        </form>
+        <div id="fileResult" class="result-box" style="display:none;"></div>
+    </div>
+</div>
+
+<!-- Active Shares -->
+<div class="active-shares">
+    <h2>📋 Active Shares</h2>
+    <div id="sharesList">
+        {% if items %}
+            {% for item in items %}
+            <div class="share-item-wrapper" data-id="{{ item.item_id }}">
+                <div class="share-item">
+                    <div class="share-info">
+                        {% if item.item_type == 'text' %}
+                            <span class="share-icon">📝</span>
+                            <div class="share-details-compact">
+                                <strong>{{ item.title or 'Untitled Text' }}</strong>
+                                <div class="meta-info">
+                                    <span>📅 {{ item.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                                    <span>👁️ {{ item.download_count }} views</span>
+                                </div>
+                            </div>
+                        {% else %}
+                            <span class="share-icon">📎</span>
+                            <div class="share-details-compact">
+                                <strong>{{ item.filename }}</strong>
+                                <div class="meta-info">
+                                    <span>📅 {{ item.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                                    <span>📦 {{ (item.file_size / 1024 / 1024)|round(2) }} MB</span>
+                                    <span>⬇️ {{ item.download_count }} downloads</span>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="share-actions">
+                        <div class="timer-status">
+                            <span class="timer" data-expires="{{ item.expires_at.isoformat() }}" data-status="active">
+                                Calculating...
+                            </span>
+                        </div>
+                        <div class="action-buttons">
+                            {% if item.item_type == 'text' %}
+                                <button onclick="copyTextContent('{{ item.item_id }}', `{{ item.content|replace('`', '\\`')|replace('$', '\\$') }}`)" class="action-btn copy-btn-action" title="Copy to clipboard">
+                                    📋 Copy
+                                </button>
+                                <button onclick="toggleDrawer('{{ item.item_id }}')" class="action-btn view-btn" title="View content">
+                                    👁️ View
+                                </button>
+                            {% else %}
+                                <a href="/download/{{ item.item_id }}" class="share-link download-btn">
+                                    ⬇️ Download
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Drawer for text content -->
+                <div id="drawer-{{ item.item_id }}" class="drawer" style="display: none;">
+                    <div class="drawer-content">
+                        <div class="drawer-header">
+                            <h3>{{ item.title or 'Untitled Text' }}</h3>
+                            <button class="drawer-close" onclick="closeDrawer('{{ item.item_id }}')">✕</button>
+                        </div>
+                        <div class="drawer-body">
+                            <div class="drawer-text">
+                                <pre>{{ item.content }}</pre>
+                            </div>
+                        </div>
+                        <div class="drawer-footer">
+                            <button onclick="copyTextContent('{{ item.item_id }}', `{{ item.content|replace('`', '\\`')|replace('$', '\\$') }}`)" class="copy-btn">
+                                📋 Copy Text
+                            </button>
+                            <span class="drawer-info">
+                                📅 {{ item.created_at.strftime('%Y-%m-%d %H:%M:%S') }} | 
+                                👁️ {{ item.download_count }} views
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-shares">No active shares. Create one above!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
