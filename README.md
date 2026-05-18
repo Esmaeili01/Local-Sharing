@@ -37,7 +37,9 @@ python app.py
 
 4. Open your browser and navigate to:
 ```
-http://localhost:5000
+http://localhost
+or 
+http://127.0.0.1
 ```
 
 For other devices on the same network, use the network IP shown in the header.
@@ -83,18 +85,6 @@ local-file-sharing/
 ├── templates/         # HTML templates
 ├── uploads/           # Uploaded files (auto-created)
 └── database/          # SQLite database (auto-created)
-```
-
-## Running on Different Ports
-
-Default port is 5000. To use port 80 (no port number in URL):
-
-```bash
-# Windows (Run as Administrator)
-python app.py --port=80
-
-# Linux/Mac (with sudo)
-sudo python app.py --port=80
 ```
 
 ## Technologies Used
