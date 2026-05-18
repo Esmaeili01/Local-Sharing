@@ -21,8 +21,8 @@ A simple web application for sharing files and text snippets across devices on y
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/local-file-sharing.git
-cd localsharing
+git clone https://github.com/Esmaeili01/Local-Sharing.git
+cd Local-Sharing
 ```
 
 2. Install dependencies:
