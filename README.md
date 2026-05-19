@@ -1,4 +1,3 @@
-```markdown
 # Local File & Text Sharing
 
 A simple web application for sharing files and text snippets across devices on your local network. No internet required - just a local network.
