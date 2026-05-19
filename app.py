@@ -173,19 +173,6 @@ def share_file():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-@app.route('/view/<item_id>')
-def view_item(item_id):
-    """View a shared text item"""
-    item = SharedItem.query.filter_by(item_id=item_id).first_or_404()
-    
-    if item.is_expired():
-        return render_template('expired.html'), 410
-    
-    if item.item_type == 'text':
-        return render_template('file_detail.html', item=item)
-    else:
-        return redirect(url_for('download_file', item_id=item_id))
-
 @app.route('/download/<item_id>')
 def download_file(item_id):
     """Download a shared file"""
