@@ -6,7 +6,7 @@ class Config:
     
     # File upload settings
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
-    MAX_CONTENT_LENGTH = 500 * 1024 * 1024  # 500MB max file size
+    MAX_CONTENT_LENGTH = 1024 * 1024 * 1024  # 1GB max file size
     
     # Database
     BASE_DIR = os.path.dirname(__file__)
